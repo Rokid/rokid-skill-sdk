@@ -1,5 +1,6 @@
-package com.rokid.skill.protocol;
+package com.rokid.skill.protocol.request;
 
+import com.google.gson.JsonElement;
 import java.util.LinkedHashMap;
 import lombok.Data;
 
@@ -25,6 +26,6 @@ public class IntentContent {
   /**
    * 当前用户语句中出现的槽以及对应的值
    */
-  private LinkedHashMap<String, String> slots;
+  private LinkedHashMap<String, JsonElement> slots;
 
 }

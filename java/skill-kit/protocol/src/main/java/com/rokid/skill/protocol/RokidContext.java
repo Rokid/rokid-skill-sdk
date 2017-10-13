@@ -1,19 +1,28 @@
 package com.rokid.skill.protocol;
 
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.rokid.skill.protocol.RokidResponse.Action;
-import com.rokid.skill.protocol.RokidResponse.ActionEnum;
 import com.rokid.skill.protocol.RokidResponse.ActionType;
 import com.rokid.skill.protocol.RokidResponse.Card;
 import com.rokid.skill.protocol.RokidResponse.CardType;
 import com.rokid.skill.protocol.RokidResponse.Form;
-import com.rokid.skill.protocol.RokidResponse.Media;
-import com.rokid.skill.protocol.RokidResponse.MediaItem;
 import com.rokid.skill.protocol.RokidResponse.Response;
 import com.rokid.skill.protocol.RokidResponse.Session;
-import com.rokid.skill.protocol.RokidResponse.Voice;
-import com.rokid.skill.protocol.RokidResponse.VoiceItem;
+import com.rokid.skill.protocol.request.IntentContent;
+import com.rokid.skill.protocol.response.Directive;
+import com.rokid.skill.protocol.response.Directive.DirectiveType;
+import com.rokid.skill.protocol.response.MediaDirective;
+import com.rokid.skill.protocol.response.MediaDirective.MediaItem;
+import com.rokid.skill.protocol.response.SoundDirective.ActionEnum;
+import com.rokid.skill.protocol.response.VoiceDirective;
+import com.rokid.skill.protocol.response.VoiceDirective.VoiceItem;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -172,13 +181,7 @@ public class RokidContext {
    * @param tts tts信息
    */
   public static void setVoice(String tts) {
-
-    Voice voice = getRokidResponseVoice();
-
-    VoiceItem item = voice.getItem();
-
-    item.setTts(tts);
-
+    setVoice(ActionEnum.PLAY, tts);
   }
 
   /**
@@ -187,28 +190,34 @@ public class RokidContext {
    * @param action 该语音操作
    * @param tts tts信息
    */
+  @SuppressWarnings("WeakerAccess")
   public static void setVoice(ActionEnum action, String tts) {
 
-    Voice voice = getRokidResponseVoice();
-
-    voice.setAction(action);
-
-    VoiceItem item = voice.getItem();
+    VoiceItem item = new VoiceItem();
 
     item.setTts(tts);
+
+    VoiceDirective voiceDirective = new VoiceDirective(item);
+
+    voiceDirective.setAction(action);
+
+    setVoice(voiceDirective);
 
   }
 
   /**
    * 设置语音信息
    *
-   * @param voiceInput 语音配置信息
+   * @param directive tts指令
    */
-  public static void setVoice(Voice voiceInput) {
+  @SuppressWarnings("WeakerAccess")
+  public static void setVoice(VoiceDirective directive) {
 
-    Action action = getRokidResponseAction();
+    List<Directive> directives = removeDirective(DirectiveType.voice);
 
-    action.setVoice(voiceInput);
+    directives.add(directive);
+
+    getResponse().getResponse().getAction().setDirectives(directives);
 
   }
 
@@ -219,9 +228,7 @@ public class RokidContext {
    */
   public static void setMedia(MediaItem item) {
 
-    Media media = getRokidResponseMedia();
-
-    media.setItem(item);
+    setMedia(ActionEnum.PLAY, item);
 
   }
 
@@ -231,14 +238,14 @@ public class RokidContext {
    * @param action 操作动作
    * @param item 媒体详细内容
    */
+  @SuppressWarnings("WeakerAccess")
   public static void setMedia(ActionEnum action, MediaItem item) {
 
-    Media media = getRokidResponseMedia();
+    MediaDirective media = new MediaDirective(item);
 
     media.setAction(action);
 
-    media.setItem(item);
-
+    setMedia(media);
   }
 
   /**
@@ -246,11 +253,14 @@ public class RokidContext {
    *
    * @param media 媒体内容
    */
-  public static void setMedia(Media media) {
+  @SuppressWarnings("WeakerAccess")
+  public static void setMedia(MediaDirective media) {
 
-    Action action = getRokidResponseAction();
+    List<Directive> directives = removeDirective(DirectiveType.media);
 
-    action.setMedia(media);
+    directives.add(media);
+
+    getResponse().getResponse().getAction().setDirectives(directives);
 
   }
 
@@ -272,6 +282,36 @@ public class RokidContext {
   }
 
   /**
+   * 设置card
+   *
+   * @param type card类型
+   */
+  public static void setCard(CardType type, String content) {
+
+    RokidResponse response = currentResponse.get();
+
+    RokidResponse.Card card = new Card();
+
+    card.setType(type);
+
+    card.setContent(content);
+
+    response.getResponse().setCard(card);
+
+  }
+
+  /**
+   * 添加一个空的指令
+   */
+  public static void addNullDirective() {
+
+    List<Directive> directives = removeDirective(DirectiveType.display);
+
+    getResponse().getResponse().getAction().setDirectives(directives);
+
+  }
+
+  /**
    * 从{@link RokidRequest}取得账户关联Id
    *
    * @return 账户关联Id
@@ -289,7 +329,7 @@ public class RokidContext {
    *
    * @return slots
    */
-  public static LinkedHashMap<String, String> getSlots(){
+  public static LinkedHashMap<String, JsonElement> getSlots() {
 
     RokidRequest.Request request = getRequest().getRequest();
 
@@ -306,7 +346,8 @@ public class RokidContext {
    *
    * @return 指定slot的值
    */
-  public static String getSlot(String key){
+  @SuppressWarnings("WeakerAccess")
+  public static JsonElement getSlotObj(String key) {
 
     RokidRequest.Request request = getRequest().getRequest();
 
@@ -315,6 +356,24 @@ public class RokidContext {
     IntentContent content = GSON.fromJson(contentJson, IntentContent.class);
 
     return content.getSlots().get(key);
+
+  }
+
+  /**
+   * 根据key取得指定的slot的值
+   *
+   * @return 指定slot的值
+   */
+  public static String getSlot(String key) {
+
+    JsonElement element = getSlotObj(key);
+
+    if (element == null || element.isJsonNull() || !element.isJsonObject()
+        || element.getAsJsonObject() == null) {
+      return "";
+    }
+
+    return element.getAsJsonObject().get("value").getAsString();
 
   }
 
@@ -355,49 +414,13 @@ public class RokidContext {
   }
 
   /**
-   * 取得当前返回体里的语音相关配置
+   * 取得指令列表
    *
-   * @return 语音相关配置
+   * @return 指令列表
    */
-  private static Voice getRokidResponseVoice() {
-
+  private static List<Directive> getRokidResponseDirective() {
     RokidResponse response = currentResponse.get();
-
-    Voice voice = response.getResponse().getAction().getVoice();
-
-    if (voice == null) {
-
-      voice = new Voice();
-
-      response.getResponse().getAction().setVoice(voice);
-
-    }
-
-    return voice;
-
-  }
-
-  /**
-   * 取得当前返回体里的媒体相关配置
-   *
-   * @return 媒体相关配置
-   */
-  private static Media getRokidResponseMedia() {
-
-    RokidResponse response = currentResponse.get();
-
-    Media media = response.getResponse().getAction().getMedia();
-
-    if (media == null) {
-
-      media = new Media();
-
-      response.getResponse().getAction().setMedia(media);
-
-    }
-
-    return media;
-
+    return response.getResponse().getAction().getDirectives();
   }
 
   /**
@@ -410,6 +433,39 @@ public class RokidContext {
     RokidRequest request = currentRequest.get();
 
     return request.getSession();
+  }
+
+  /**
+   * 根据指令类型删除并取得指令列表
+   *
+   * @param type 指令类型
+   * @return 指令列表
+   */
+  private static List<Directive> removeDirective(final DirectiveType type) {
+
+    List<Directive> directives = getRokidResponseDirective();
+
+    Optional<Directive> directiveOptional = Iterables
+        .tryFind(directives, new Predicate<Directive>() {
+          @Override
+          public boolean apply(Directive input) {
+            return input != null && input.getType() == type;
+          }
+        });
+
+    if (directiveOptional.isPresent()) {
+
+      Iterators.removeIf(directives.iterator(), new Predicate<Directive>() {
+        @Override
+        public boolean apply(Directive input) {
+          return input != null && input.getType() == type;
+        }
+      });
+
+    }
+
+    return directives;
+
   }
 
 }

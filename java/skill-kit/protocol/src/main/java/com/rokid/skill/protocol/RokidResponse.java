@@ -1,12 +1,10 @@
 package com.rokid.skill.protocol;
 
+import com.rokid.skill.protocol.response.Directive;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * CloudApp 向客户端的返回结果
@@ -106,29 +104,12 @@ public class RokidResponse {
      * 同时，当 shouldEndSession 为 true 时，CloudAppClient 将会忽略 EventRequests，
      * 即在action执行过程中不会产生 EventRequest
      */
-    private boolean shouldEndSession = true;
+    private boolean shouldEndSession = false;
 
     /**
-     * 语音交互内容
+     * 指令列表
      */
-    private Voice voice;
-
-    /**
-     * 流媒体内容
-     */
-    private Media media;
-
-    /**
-     * 客户端显示属性
-     */
-    private Display display;
-
-    /**
-     * 确认信息
-     */
-    private Confirm confirm;
-
-    private Pickup pickup = new Pickup();
+    private List<Directive> directives = new LinkedList<>();
 
   }
 
@@ -143,130 +124,11 @@ public class RokidResponse {
      */
     private CardType type;
 
-  }
-
-  /**
-   * 声音相关设置
-   */
-  @Data
-  @SuppressWarnings("WeakerAccess")
-  public static class Voice {
-
     /**
-     * 表示对当前voice的操作，
-     * 可以播放（PLAY)、暂停（PAUSE）、继续播放（RESUME）和停止（STOP）
-     * （具体Action行为参照Media的Action行为，但是目前暂未实现，PAUSE以及RESUME操作）;
+     * card内容
      */
-    private ActionEnum action = ActionEnum.PLAY;
+    private String content;
 
-    /**
-     * 不监听event request
-     */
-    private boolean disableEvent = false;
-
-    /**
-     * voice的具体内容
-     */
-    private VoiceItem item = new VoiceItem();
-
-  }
-
-  /**
-   * 媒体音频相关
-   */
-  @Data
-  @SuppressWarnings("WeakerAccess")
-  public static class Media {
-
-    /**
-     * 对MediaPlayer的操作，目前只支持 4 种操作：PLAY， PAUSE ， RESUME 和 STOP。其中，只有PLAY接受item数据。
-     * PLAY：如果有item数据，则按照最新的item从头开始播放，如果没有item数据，且原来有在播放的内容，则从原来播放的内容开始播放
-     * PAUSE：暂停当前播放的内容，播放的进度等数据不会丢失（可以直接通过RESUME指令直接恢复原来的播放状态）
-     * RESUME：继续播放（从原来的播放进度播放）
-     * STOP：停止播放，并且清空当前的播放进度，但是播放内容不清
-     */
-    private ActionEnum action = ActionEnum.PLAY;
-
-    /**
-     * 不监听event request
-     */
-    private boolean disableEvent = false;
-
-    /**
-     * 播放内容
-     */
-    private MediaItem item = new MediaItem();
-
-  }
-
-  /**
-   * voice的具体内容
-   */
-  @Data
-  @SuppressWarnings("WeakerAccess")
-  public static class VoiceItem {
-
-    /**
-     * 需要播报的TTS内容
-     */
-    private String tts;
-
-  }
-
-  /**
-   * 播放内容
-   */
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @SuppressWarnings("WeakerAccess")
-  public static class MediaItem {
-
-    /**
-     * 用于鉴权的token，由CloudApp填充和判断
-     */
-    private String token;
-
-    /**
-     * 媒体类型
-     */
-    @Builder.Default
-    private MediaType type = MediaType.AUDIO;
-
-    /**
-     * 可用的流媒体播放链接
-     */
-    private String url;
-
-    /**
-     * 毫秒数值，表明从哪里开始播放
-     */
-    private long offsetInMilliseconds;
-
-  }
-
-  /**
-   * 播放相关枚举
-   */
-  @SuppressWarnings("unused")
-  public enum ActionEnum {
-    /**
-     * 播放
-     */
-    PLAY,
-    /**
-     * 暂停
-     */
-    PAUSE,
-    /**
-     * 继续播放
-     */
-    RESUME,
-    /**
-     * 停止
-     */
-    STOP
   }
 
   /**
@@ -304,21 +166,6 @@ public class RokidResponse {
   }
 
   /**
-   * 媒体类型
-   */
-  @SuppressWarnings("unused")
-  public enum MediaType {
-    /**
-     * 音频
-     */
-    AUDIO,
-    /**
-     * 视频
-     */
-    VIDEO
-  }
-
-  /**
    * Card类型
    */
   @SuppressWarnings("unused")
@@ -326,55 +173,11 @@ public class RokidResponse {
     /**
      * 账户关联
      */
-    ACCOUNT_LINK
+    ACCOUNT_LINK,
+    /**
+     * 聊天类型
+     */
+    CHAT
   }
 
-  /**
-   * display属性
-   */
-  @Data
-  public static class Display {
-
-  }
-
-  /**
-   * 确认相关信息
-   */
-  @Data
-  public static class Confirm {
-
-    /**
-     * 确认相关意图
-     */
-    private String confirmIntent;
-
-    /**
-     * 确认相关槽
-     */
-    private String confirmSlot;
-
-    /**
-     * 可选信息
-     */
-    private List<String> optionWords = new LinkedList<>();
-
-  }
-
-  /**
-   * 拾音功能控制
-   */
-  @Data
-  public static class Pickup {
-
-    /**
-     * 是否启用
-     */
-    private boolean enable = false;
-
-    /**
-     * 拾音持续时间
-     */
-    private long durationInMilliseconds = 1000;
-
-  }
 }

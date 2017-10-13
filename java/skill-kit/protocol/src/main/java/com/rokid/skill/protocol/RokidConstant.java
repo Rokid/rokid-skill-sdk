@@ -55,6 +55,16 @@ public interface RokidConstant {
      */
     String ROKID_EVENT_UNKNOWN = "ROKID.EVENT.ROKID_UNKNOWN";
 
+    /**
+     * 语音开始EVENT
+     */
+    String ROKID_VOICE_STARTED = "Voice.STARTED";
+
+    /**
+     * 语音结束EVENT
+     */
+    String ROKID_VOICE_FINISHED = "Voice.FINISHED";
+
   }
 
 }

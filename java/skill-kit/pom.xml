@@ -6,7 +6,7 @@
 
   <groupId>com.rokid.skill</groupId>
   <artifactId>skill-kit</artifactId>
-  <version>0.0.3.BETA-SNAPSHOT</version>
+  <version>0.0.7</version>
   <modules>
     <module>protocol</module>
     <module>rokid-dispatcher</module>

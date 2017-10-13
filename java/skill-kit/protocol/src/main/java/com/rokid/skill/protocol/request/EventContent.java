@@ -1,4 +1,4 @@
-package com.rokid.skill.protocol;
+package com.rokid.skill.protocol.request;
 
 import java.util.LinkedHashMap;
 import lombok.Data;

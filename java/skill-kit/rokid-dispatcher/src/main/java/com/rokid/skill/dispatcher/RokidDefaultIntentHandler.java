@@ -1,6 +1,7 @@
 package com.rokid.skill.dispatcher;
 
-import com.rokid.skill.protocol.IntentContent;
+import com.rokid.skill.protocol.request.EventContent;
+import com.rokid.skill.protocol.request.IntentContent;
 import com.rokid.skill.protocol.RokidRequest;
 
 /**
@@ -22,6 +23,20 @@ public interface RokidDefaultIntentHandler {
    *
    * @param request rokid request
    */
-  void hadnleExitIntent(RokidRequest<IntentContent> request);
+  void handleExitIntent(RokidRequest<IntentContent> request);
+
+  /**
+   * handle voice started event
+   *
+   * @param request rokid request
+   */
+  void handleVoiceStarted(RokidRequest<EventContent> request);
+
+  /**
+   * handle voice finished event
+   *
+   * @param request rokid request
+   */
+  void handleVoiceFinished(RokidRequest<EventContent> request);
 
 }
