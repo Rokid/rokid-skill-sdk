@@ -1,5 +1,6 @@
 package com.rokid.skill.protocol;
 
+import com.google.gson.JsonElement;
 import java.util.LinkedHashMap;
 import lombok.Data;
 
@@ -52,7 +53,7 @@ public class RokidRequest<T> {
     /**
      * 为CloudApp提供attributes字段留保存上下文信息的字段
      */
-    private LinkedHashMap<String, String> attributes;
+    private LinkedHashMap<String, JsonElement> attributes;
 
   }
 
@@ -151,6 +152,16 @@ public class RokidRequest<T> {
     private String deviceId;
 
     /**
+     * 设备主人Id
+     */
+    private String masterId;
+
+    /**
+     * 设备当前激活词
+     */
+    private String voicetrigger;
+
+    /**
      * 国家及语言，标准locale格式
      */
     private String locale;
@@ -226,6 +237,40 @@ public class RokidRequest<T> {
      */
     private String longitude;
 
+    /**
+     * 国家
+     */
+    private String country;
+
+    /**
+     * 州/省份
+     */
+    private String state;
+
+    /**
+     * 城市
+     */
+    private String city;
+
+    /**
+     * 区县
+     */
+    private String area;
+
+    /**
+     * 地区，行政
+     */
+    private String district;
+
+    /**
+     * 街道
+     */
+    private String street;
+
+    /**
+     * 时区
+     */
+    private String timeZone;
   }
 
   /**

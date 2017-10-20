@@ -23,7 +23,6 @@ import com.rokid.skill.protocol.response.VoiceDirective;
 import com.rokid.skill.protocol.response.VoiceDirective.VoiceItem;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author lion.xys
@@ -104,31 +103,13 @@ public class RokidContext {
   /**
    * 添加session值
    *
-   * @param key session 键
-   * @param value session 值
-   */
-  public static void addSessionAttributes(String key, String value) {
-
-    RokidResponse.Session session = getRokidResponseSession();
-
-    LinkedHashMap<String, String> attributes = new LinkedHashMap<>();
-
-    attributes.put(key, value);
-
-    session.setAttributes(attributes);
-
-  }
-
-  /**
-   * 添加session值
-   *
    * @param attributes session 键值
    */
-  public static void addSessionAttributes(Map<String, String> attributes) {
+  public static void addSessionAttributes(LinkedHashMap<String, JsonElement> attributes) {
 
     RokidResponse.Session session = getRokidResponseSession();
 
-    LinkedHashMap<String, String> attributesTmp = new LinkedHashMap<>();
+    LinkedHashMap<String, JsonElement> attributesTmp = new LinkedHashMap<>();
 
     attributesTmp.putAll(attributes);
 

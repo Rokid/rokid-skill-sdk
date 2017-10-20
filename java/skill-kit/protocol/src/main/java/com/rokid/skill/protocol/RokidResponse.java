@@ -1,5 +1,6 @@
 package com.rokid.skill.protocol;
 
+import com.google.gson.JsonElement;
 import com.rokid.skill.protocol.response.Directive;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -47,7 +48,7 @@ public class RokidResponse {
     /**
      * 上下文信息
      */
-    private LinkedHashMap<String, String> attributes;
+    private LinkedHashMap<String, JsonElement> attributes;
 
   }
 
@@ -177,7 +178,11 @@ public class RokidResponse {
     /**
      * 聊天类型
      */
-    CHAT
+    CHAT,
+    /**
+     * 其他账户关联
+     */
+    OTHER_ACCOUNT_LINK
   }
 
 }

@@ -24,6 +24,11 @@ public class IntentContent {
   private String intent;
 
   /**
+   * 用户语句
+   */
+  private String sentence;
+
+  /**
    * 当前用户语句中出现的槽以及对应的值
    */
   private LinkedHashMap<String, JsonElement> slots;
